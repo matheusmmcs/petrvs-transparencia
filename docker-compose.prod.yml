@@ -3,9 +3,9 @@ services:
   api:
     build: .
     image: transparencia-pgd/api:latest
+    shm_size: "2g"
     mem_limit: 3g
     mem_reservation: 2g
-    shm_size: "1g"  # Aumenta a memória compartilhada
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
