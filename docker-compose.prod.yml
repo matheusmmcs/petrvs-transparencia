@@ -3,6 +3,8 @@ services:
   api:
     build: .
     image: transparencia-pgd/api:latest
+    mem_limit: 2g
+    mem_reservation: 1g
     environment:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
