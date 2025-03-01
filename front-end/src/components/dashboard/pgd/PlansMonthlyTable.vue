@@ -72,7 +72,18 @@ function clearFilter() {
     initFilters();
 }
 
+function isValidDate(date) {
+    return date && Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date);
+}
+
 function formatDate(value) {
+    if (!isValidDate(value)) {
+        try {
+            value = new Date(value);
+        } catch (error) {
+            return value;
+        }
+    }
     return value.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -200,8 +211,8 @@ watch(
             </Column>
         </DataTable>
 
-        <Dialog v-model:visible="showModal" maximizable modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-            <Accordion :value="['0', '1', '2']" multiple>
+        <Dialog v-model:visible="showModal" maximizable modal header="Dados do Plano de Trabalho" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <Accordion :value="['0', '1', '2', '3']" multiple>
                 <AccordionPanel value="0" v-if="userModal">
                     <AccordionHeader>Servidor</AccordionHeader>
                     <AccordionContent>
@@ -225,7 +236,7 @@ watch(
                         </div>
                     </AccordionContent>
                 </AccordionPanel>
-                <AccordionPanel value="1">
+                <AccordionPanel value="1" v-if="userModal">
                     <AccordionHeader>Plano de Trabalho</AccordionHeader>
                     <AccordionContent>
                         <div class="flex flex-col items-start justify-start gap-2">
@@ -252,8 +263,8 @@ watch(
                         </div>
                     </AccordionContent>
                 </AccordionPanel>
-                <AccordionPanel value="2">
-                    <AccordionHeader>Unidade do Plano</AccordionHeader>
+                <AccordionPanel value="2" v-if="userModal">
+                    <AccordionHeader>Unidade do Plano de Trabalho</AccordionHeader>
                     <AccordionContent>
                         <div class="flex flex-col items-start justify-start gap-2">
                             <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
@@ -263,6 +274,33 @@ watch(
                             <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
                                 <div class="">Sigla da Unidade:</div>
                                 <span class="text-surface-500 dark:text-surface-400"> {{ userModal.unidade_sigla }} </span>
+                            </div>
+                        </div>
+                    </AccordionContent>
+                </AccordionPanel>
+                <AccordionPanel value="3" v-if="userModal">
+                    <AccordionHeader>Programa do Plano de Trabalho</AccordionHeader>
+                    <AccordionContent>
+                        <div class="flex flex-col items-start justify-start gap-2">
+                            <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
+                                <div class="">Nome do Programa:</div>
+                                <span class="text-surface-500 dark:text-surface-400"> {{ userModal.programa_nome }} </span>
+                            </div>
+                            <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
+                                <div class="">Data de Início do Programa:</div>
+                                <span class="text-surface-500 dark:text-surface-400"> {{ formatDate(userModal.programa_data_inicio) }} </span>
+                            </div>
+                            <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
+                                <div class="">Data de Término do Programa:</div>
+                                <span class="text-surface-500 dark:text-surface-400"> {{ formatDate(userModal.programa_data_fim) }} </span>
+                            </div>
+                            <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
+                                <div class="">Unidade Autorizadora do Programa:</div>
+                                <span class="text-surface-500 dark:text-surface-400"> {{ userModal.programa_unidade_autorizadora_nome }} </span>
+                            </div>
+                            <div class="flex flex-row items-center justify-start gap-2 font-medium text-md">
+                                <div class="">Unidade Instituidora do Programa:</div>
+                                <span class="text-surface-500 dark:text-surface-400"> {{ userModal.programa_unidade_instituidora_nome }} </span>
                             </div>
                         </div>
                     </AccordionContent>

@@ -40,12 +40,20 @@ SQL_QUERY = """
       un.nome as unidade_nome,
       un.sigla as unidade_sigla,
       un.codigo as unidade_codigoo,
-      tm.nome as modalidade_nome
+      tm.nome as modalidade_nome,
+      pg.nome as programa_nome,
+      pg.data_inicio as programa_data_inicio,
+      pg.data_fim as programa_data_fim,
+      un_inst.nome as programa_unidade_instituidora_nome,
+      un_aut.nome as programa_unidade_autorizadora_nome
       #documento
     from petrvs_ufpi.planos_trabalhos pt 
     inner join petrvs_ufpi.usuarios u on pt.usuario_id = u.id 
     inner join petrvs_ufpi.unidades un on pt.unidade_id = un.id 
     inner join petrvs_ufpi.tipos_modalidades tm on pt.tipo_modalidade_id = tm.id
+    inner join petrvs_ufpi.programas pg on pg.id = pt.programa_id 
+    inner join petrvs_ufpi.unidades un_inst on pg.unidade_id = un_inst.id 
+    inner join petrvs_ufpi.unidades un_aut on pg.unidade_id = un_aut.id 
     #inner join petrvs_ufpi.documentos d on pt.documento_id = d.id   
     where 
     u.cod_jornada < 99
