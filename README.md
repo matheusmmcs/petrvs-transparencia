@@ -17,15 +17,6 @@ DB_PORT=3306
 DB_NAME=petrvs_tenant
 ```
 
- 
- - front-end/.env:
- 
-```ini
-VITE_API_URL=http://localhost:8880
-VITE_HEADER_TITLE=Transparência PGD - Órgão
-VITE_FOOTER_TEXT=STI e CPGD / UFPI © 2025
-```
-
  Em seguida executar o comando:
 
 ```sh
@@ -43,10 +34,8 @@ open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args
 Para realizar a limpeza de lixo do docker:
 
 ```sh
-docker ps -a | grep 'transparencia-pgd/api' | awk '{print $1}' | xargs docker rm -f
-docker ps -a | grep 'transparencia-pgd/frontend' | awk '{print $1}' | xargs docker rm -f
-docker images | grep 'transparencia-pgd/api' | awk '{print $3}' | xargs docker rmi -f
-docker images | grep 'transparencia-pgd/frontend' | awk '{print $3}' | xargs docker rmi -f
+docker ps -a | grep 'petrvs-transparencia' | awk '{print $1}' | xargs docker rm -f
+docker images | grep 'petrvs-transparencia' | awk '{print $3}' | xargs docker rmi -f
 docker volume prune -f
 
 ```
