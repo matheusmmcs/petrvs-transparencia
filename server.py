@@ -22,51 +22,21 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 app = FastAPI()
 
-SQL_QUERY = """
-    SELECT 
-      pt.id as plano_trablho_id,
-      pt.numero as plano_trabalho_numero,
-      pt.data_inicio as plano_trabalho_data_inicio,
-      pt.data_fim as plano_trabalho_data_fim,
-      pt.status as plano_trabalho_status,
-      u.apelido as usuario_apelido,
-      u.nome as usuario_nome,
-      CONCAT(SUBSTRING(u.cpf, 1, 3), '.***.***-**') AS usuario_cpf_mascarado,
-      u.telefone as usuario_telefone,
-        CASE 
-            WHEN LOCATE('petrvs.gov.br', u.email) = 0 THEN u.email 
-            ELSE NULL 
-        END AS usuario_email_filtrado,
-      un.nome as unidade_nome,
-      un.sigla as unidade_sigla,
-      un.codigo as unidade_codigoo,
-      tm.nome as modalidade_nome,
-      pg.nome as programa_nome,
-      pg.data_inicio as programa_data_inicio,
-      pg.data_fim as programa_data_fim,
-      un_inst.nome as programa_unidade_instituidora_nome,
-      un_aut.nome as programa_unidade_autorizadora_nome
-      #documento
-    from petrvs_ufpi.planos_trabalhos pt 
-    inner join petrvs_ufpi.usuarios u on pt.usuario_id = u.id 
-    inner join petrvs_ufpi.unidades un on pt.unidade_id = un.id 
-    inner join petrvs_ufpi.tipos_modalidades tm on pt.tipo_modalidade_id = tm.id
-    inner join petrvs_ufpi.programas pg on pg.id = pt.programa_id 
-    inner join petrvs_ufpi.unidades un_inst on pg.unidade_id = un_inst.id 
-    inner join petrvs_ufpi.unidades un_aut on pg.unidade_id = un_aut.id 
-    #inner join petrvs_ufpi.documentos d on pt.documento_id = d.id   
-    where 
-    u.cod_jornada < 99
-    AND pt.status in (
-      'ATIVO',
-      'AGUARDANDO_ASSINATURA',
-      'CONCLUIDO',
-      'INCLUIDO'
-    )
-    AND pt.data_inicio >= :data_inicio 
-    AND pt.data_fim < :data_fim
-    ORDER BY u.nome, pt.created_at DESC;
-"""
+# Carregar consulta SQL do arquivo
+SQL_FILE_PLANOS = "querybox/planos.sql"
+
+def load_sql_query():
+    """Carrega a consulta SQL do arquivo e substitui {DB_NAME} pelo valor parametrizado."""
+    try:
+        with open(SQL_FILE_PLANOS, "r", encoding="utf-8") as file:
+            sql_query = file.read()
+            return sql_query.replace("{DB_NAME}", DB_NAME)
+    except FileNotFoundError:
+        raise RuntimeError(f"Arquivo {SQL_FILE_PLANOS} não encontrado")
+    except Exception as e:
+        raise RuntimeError(f"Erro ao carregar a consulta SQL: {e}")
+
+SQL_QUERY = load_sql_query()
 
 @app.get("/planos")
 def get_planos(data_inicio: str = Query(...), data_fim: str = Query(...)):
@@ -74,9 +44,12 @@ def get_planos(data_inicio: str = Query(...), data_fim: str = Query(...)):
         data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").date()
         data_fim = datetime.strptime(data_fim, "%Y-%m-%d").date()
         db = SessionLocal()
+
         print(f"Data Início: {data_inicio}, Data Fim: {data_fim}")
+
         result = db.execute(text(SQL_QUERY), {"data_inicio": data_inicio, "data_fim": data_fim})
         planos = [dict(row) for row in result.mappings()]
+
         return planos
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
