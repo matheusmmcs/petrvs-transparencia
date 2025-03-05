@@ -38,7 +38,7 @@ def load_sql_query():
 
 SQL_QUERY = load_sql_query()
 
-@app.get("/planos")
+@app.get("/transparencia-api/planos")
 def get_planos(data_inicio: str = Query(...), data_fim: str = Query(...)):
     try:
         data_inicio = datetime.strptime(data_inicio, "%Y-%m-%d").date()
