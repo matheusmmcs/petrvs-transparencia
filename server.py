@@ -24,19 +24,18 @@ app = FastAPI()
 
 # Carregar consulta SQL do arquivo
 SQL_FILE_PLANOS = "querybox/planos.sql"
+SQL_FILE_ENTREGAS = "querybox/entregas.sql"
 
-def load_sql_query():
+def load_sql_query(path: str):
     """Carrega a consulta SQL do arquivo e substitui {DB_NAME} pelo valor parametrizado."""
     try:
-        with open(SQL_FILE_PLANOS, "r", encoding="utf-8") as file:
+        with open(path, "r", encoding="utf-8") as file:
             sql_query = file.read()
             return sql_query.replace("{DB_NAME}", DB_NAME)
     except FileNotFoundError:
-        raise RuntimeError(f"Arquivo {SQL_FILE_PLANOS} não encontrado")
+        raise RuntimeError(f"Arquivo {path} não encontrado")
     except Exception as e:
         raise RuntimeError(f"Erro ao carregar a consulta SQL: {e}")
-
-SQL_QUERY = load_sql_query()
 
 @app.get("/transparencia-api/planos")
 def get_planos(data_inicio: str = Query(...), data_fim: str = Query(...)):
@@ -47,10 +46,30 @@ def get_planos(data_inicio: str = Query(...), data_fim: str = Query(...)):
 
         print(f"Data Início: {data_inicio}, Data Fim: {data_fim}")
 
-        result = db.execute(text(SQL_QUERY), {"data_inicio": data_inicio, "data_fim": data_fim})
+        sql = load_sql_query(SQL_FILE_PLANOS)
+
+        result = db.execute(text(sql), {"data_inicio": data_inicio, "data_fim": data_fim})
         planos = [dict(row) for row in result.mappings()]
 
         return planos
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+@app.get("/transparencia-api/entregas")
+def get_planos(cpf: str = Query(...)):
+    try:
+        db = SessionLocal()
+
+        print(f"CPF: {cpf}")
+
+        sql = load_sql_query(SQL_FILE_ENTREGAS)
+
+        result = db.execute(text(sql), {"cpf": cpf})
+        entregas = [dict(row) for row in result.mappings()]
+
+        return entregas
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
