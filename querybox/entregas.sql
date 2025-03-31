@@ -1,6 +1,8 @@
 SELECT 
+  pte.id as entrega_id,
   pte.forca_trabalho as entrega_forca_trabalho,
   pte.descricao as entrega_descricao,
+  pee.id as plano_entrega_id,
   pee.descricao as plano_entrega_descricao,
   pt.numero as plano_trabalho_numero,
   pt.data_inicio as plano_trabalho_data_inicio,
