@@ -31,8 +31,7 @@ inner join {DB_NAME}.unidades un_inst on pg.unidade_id = un_inst.id
 inner join {DB_NAME}.unidades un_aut on pg.unidade_id = un_aut.id 
 #inner join {DB_NAME}.documentos d on pt.documento_id = d.id   
 where 
-u.cod_jornada < 99
-AND pt.status in (
+pt.status in (
   'ATIVO',
   'AGUARDANDO_ASSINATURA',
   'CONCLUIDO',

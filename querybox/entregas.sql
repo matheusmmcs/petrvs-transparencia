@@ -13,8 +13,7 @@ inner join {DB_NAME}.planos_trabalhos pt on pt.id = pte.plano_trabalho_id
 inner join {DB_NAME}.usuarios u on pt.usuario_id = u.id 
 left join {DB_NAME}.planos_entregas_entregas pee on (pee.id = pte.plano_entrega_entrega_id)
 where 
-u.cod_jornada < 99
-AND pt.status in (
+pt.status in (
   'ATIVO',
   'AGUARDANDO_ASSINATURA',
   'INCLUIDO'
