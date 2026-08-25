@@ -6,27 +6,33 @@ on:
       version:
         description: "Versão"
         required: true
-        default: "lastest"
+        default: "latest"
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: TransparenciaPGD
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Login no GitHub Container Registry (usando Credential Store)
-        run: echo "${{ secrets.GHCR_BPD }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+      - name: Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Construir e enviar a imagem Docker
         run: |
           VERSION=${{ github.event.inputs.version }}
-          echo "Imagem = ghcr.io/${{ github.repository }}:$VERSION"
-          IMAGE_NAME=ghcr.io/${{ github.repository }}:$VERSION
+          # Garante que o nome da imagem esteja em minúsculas (exigência do GHCR)
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME="ghcr.io/${REPO_LOWER}:${VERSION}"
+          
+          echo "Imagem = $IMAGE_NAME"
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
-
-      - name: Logout do Docker
-        run: docker logout ghcr.io
