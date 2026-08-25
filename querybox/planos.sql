@@ -15,7 +15,7 @@ SELECT
   un.nome as unidade_nome,
   un.sigla as unidade_sigla,
   un.codigo as unidade_codigoo,
-  tm.nome as modalidade_nome,
+  pt.modalidade_pgd as modalidade_nome,
   pg.nome as programa_nome,
   pg.data_inicio as programa_data_inicio,
   pg.data_fim as programa_data_fim,
@@ -25,7 +25,6 @@ SELECT
 from {DB_NAME}.planos_trabalhos pt 
 inner join {DB_NAME}.usuarios u on pt.usuario_id = u.id 
 inner join {DB_NAME}.unidades un on pt.unidade_id = un.id 
-inner join {DB_NAME}.tipos_modalidades tm on pt.tipo_modalidade_id = tm.id
 inner join {DB_NAME}.programas pg on pg.id = pt.programa_id 
 inner join {DB_NAME}.unidades un_inst on pg.unidade_id = un_inst.id 
 inner join {DB_NAME}.unidades un_aut on pg.unidade_id = un_aut.id 
